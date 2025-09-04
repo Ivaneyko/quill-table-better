@@ -824,38 +824,73 @@ class TableMenus {
     if (!table) return;
     requestAnimationFrame(() => {
       this.root.classList.remove('ql-table-triangle-none');
-      const [tableBounds, containerBounds] = this.getCorrectBounds(table);
-      const { left, right, top, bottom } = tableBounds;
-      const { height, width } = this.root.getBoundingClientRect();
-      const toolbar = this.quill.getModule('toolbar');
-      // @ts-expect-error
-      const computedStyle = getComputedStyle(toolbar.container);
-      let correctTop = top - height - 10;
-      let correctLeft = (left + right - width) >> 1;
-      if (correctTop > -parseInt(computedStyle.paddingBottom)) {
-        this.root.classList.add('ql-table-triangle-up');
-        this.root.classList.remove('ql-table-triangle-down');
-      } else {
-        if (bottom > containerBounds.height) {
-          correctTop = containerBounds.height + 10;
-        } else {
-          correctTop = bottom + 10;
-        }
+      const cell = this.getFocusedCell(table);
+      const bounds = this.getCellBounds(cell, table);
+      const rowPos = this.getRowPosition(cell);
+      const pos = this.getMenuPosition(bounds, rowPos);
+      if (pos.triangle === 'down') {
         this.root.classList.add('ql-table-triangle-down');
         this.root.classList.remove('ql-table-triangle-up');
-      }
-      if (correctLeft < containerBounds.left) {
-        correctLeft = 0;
-        this.root.classList.add('ql-table-triangle-none');
-      } else if (correctLeft + width > containerBounds.right) {
-        correctLeft = containerBounds.right - width;
-        this.root.classList.add('ql-table-triangle-none');
+      } else if (pos.triangle === 'up') {
+        this.root.classList.add('ql-table-triangle-up');
+        this.root.classList.remove('ql-table-triangle-down');
       }
       setElementProperty(this.root, {
-        left: `${correctLeft}px`,
-        top: `${correctTop}px`
+        position: 'fixed',
+        left: `${pos.left}px`,
+        top: `${pos.top}px`
       });
     });
+  }
+
+  // Helper: get focused cell
+  getFocusedCell(table: HTMLElement): HTMLElement | null {
+    const focusedCells = table.querySelectorAll('.ql-cell-focused, .ql-cell-selected');
+    return focusedCells.length > 0 ? focusedCells[0] as HTMLElement : null;
+  }
+
+  // Helper: get cell bounds
+  getCellBounds(cell: HTMLElement | null, table: HTMLElement): DOMRect {
+    if (cell) return cell.getBoundingClientRect();
+    const [bounds] = this.getCorrectBounds(table);
+    return bounds as DOMRect;
+  }
+
+  // Helper: check if cell is in first/last row
+  getRowPosition(cell: HTMLElement | null): { isFirstRow: boolean; isLastRow: boolean } {
+    let isFirstRow = false, isLastRow = false;
+    if (cell) {
+      const tr = cell.closest('tr');
+      if (tr && tr.parentElement) {
+        const rows = Array.from(tr.parentElement.children).filter((child): child is HTMLElement => {
+          return (child as HTMLElement).tagName === 'TR';
+        });
+        if (rows.length > 0) {
+          isFirstRow = tr.isEqualNode(rows[0]);
+          isLastRow = tr.isEqualNode(rows[rows.length - 1]);
+        }
+      }
+    }
+    return { isFirstRow, isLastRow };
+  }
+
+  // Helper: calculate menu position
+  getMenuPosition(
+    bounds: DOMRect,
+    rowPos: { isFirstRow: boolean; isLastRow: boolean }
+  ): { left: number; top: number; triangle: 'up' | 'down' } {
+    const { left, top, height, width } = bounds;
+    // Center menu horizontally over selected cell
+    let correctLeft = left + (width / 2) - (this.root.offsetWidth / 2);
+    let correctTop;
+    if (rowPos.isFirstRow || !rowPos.isLastRow) {
+      correctTop = top + height + 10;
+      return { left: correctLeft, top: correctTop, triangle: 'down' };
+    } else if (rowPos.isLastRow) {
+      correctTop = top - this.root.offsetHeight - 10;
+      return { left: correctLeft, top: correctTop, triangle: 'up' };
+    }
+    return { left: correctLeft, top: top + height + 10, triangle: 'down' };
   }
 
   updateScroll(scroll: boolean) {

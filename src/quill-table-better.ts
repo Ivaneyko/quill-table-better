@@ -172,7 +172,7 @@ class Table extends Module {
     const range = this.quill.getSelection(true);
     if (range == null) return;
     if (this.isTable(range)) return;
-    const style = `width: ${CELL_DEFAULT_WIDTH * columns}px`
+    const style = `width: ${CELL_DEFAULT_WIDTH * columns}px`;
     const formats = this.quill.getFormat(range.index - 1);
     const [, offset] = this.quill.getLine(range.index);
     const isExtra = !!formats[TableCellBlock.blotName] || offset !== 0;
