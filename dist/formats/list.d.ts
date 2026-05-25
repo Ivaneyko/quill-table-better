@@ -17,7 +17,7 @@ declare class TableList extends List {
     parent: ListContainer;
     format(name: string, value: string | Props, isReplace?: boolean): import("parchment").Blot;
     getCellFormats(parent: TableCell | TableCellChildren): [Props, string];
-    getCorrectCellFormats(value: Props): [Props, string];
+    getCorrectCellFormats(value: Props): [Props, string, string];
     private getListContainer;
     static register(): void;
     setReplace(isReplace: boolean, formats: Props): void;

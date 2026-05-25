@@ -1,4 +1,4 @@
-import type { Props, TableMenus, UseLanguageHandler } from '../types';
+import type { Props, TableContainer, TableMenus, UseLanguageHandler } from '../types';
 interface Child {
     category: string;
     propertyName: string;
@@ -82,5 +82,6 @@ declare class TablePropertiesForm {
     updatePropertiesForm(container: HTMLElement, type: string): void;
     updateSelectColor(element: Element, value: string): void;
     updateSelectedStatus(container: HTMLDivElement, value: string, type: string): void;
+    updateTableWidth(table: HTMLElement, tableBlot: TableContainer, isPercent: boolean): void;
 }
 export default TablePropertiesForm;

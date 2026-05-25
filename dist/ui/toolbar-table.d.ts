@@ -9,6 +9,7 @@ declare class TableSelect {
     constructor();
     clearSelected(children: NodeListOf<Element> | Element[]): void;
     createContainer(): HTMLDivElement;
+    getClickInfo(e: MouseEvent): [boolean, Element];
     getComputeChildren(children: HTMLCollection, e: MouseEvent): Element[];
     getSelectAttrs(element: Element): number[];
     handleClick(e: MouseEvent, insertTable: InsertTableHandler): void;
@@ -17,6 +18,6 @@ declare class TableSelect {
     insertTable(child: Element, insertTable: InsertTableHandler): void;
     setLabelContent(label: Element, child: Element): void;
     show(element: Element): void;
-    toggle(element: Element): void;
+    toggle(element: Element, isBetweenSpans: boolean): void;
 }
 export { TableSelect, ToolbarTable as default };

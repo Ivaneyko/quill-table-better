@@ -1,8 +1,8 @@
 import Quill from 'quill';
-import { BlockBlot, EmbedBlot } from 'parchment';
+import type { BlockBlot, EmbedBlot } from 'parchment';
 import type { AttributeMap, Op } from 'quill-delta';
-import type { QuillTableBetter, TableCellChildren, TableContainer, TableRow } from '../types';
-import { TableCell } from '../formats/table';
+import type { QuillTableBetter, TableCellChildren, TableContainer } from '../types';
+import { TableCell, TableRow } from '../formats/table';
 declare class CellSelection {
     quill: Quill;
     selectedTds: Element[];
@@ -44,11 +44,16 @@ declare class CellSelection {
     })[];
     getPasteLastRow(row: TableRow, len: number): TableRow;
     getPasteTds(computeSelectedTds: Element[]): Element[][];
+    getTableArrowVerticalRow(cell: TableCell, up: boolean): TableRow;
     getText(html: string): string;
     handleClick(e: MouseEvent): void;
     handleDeleteKeyup(e: KeyboardEvent): void;
     handleKeyup(e: KeyboardEvent): void;
     handleMousedown(e: MouseEvent): void;
+    hasTdTh(selectedTds: Element[]): {
+        hasTd: boolean;
+        hasTh: boolean;
+    };
     initDocumentListener(): void;
     initWhiteList(): void;
     insertColumnCell(table: TableContainer, offset: number): void;
@@ -61,11 +66,14 @@ declare class CellSelection {
     onCaptureCopy(e: ClipboardEvent, isCut?: boolean): void;
     onCapturePaste(e: ClipboardEvent): void;
     pasteSelectedTd(selectedTd: Element, copyTd: Element): TableCell;
+    pasteTextIntoCell(text: string): void;
     removeCursor(): void;
     removeSelectedTdContent(td: Element): void;
     removeSelectedTdsContent(): void;
     setCorrectPositionTds(startTd: Element, endTd: Element, selectedTds: Element[]): void;
     setDisabled(disabled: boolean): void;
+    setHeaderRowSwitch(): void;
+    setMenuDisable(category: string): void;
     setSelected(target: Element, force?: boolean): void;
     setSelectedTds(selectedTds: Element[]): void;
     setSelectedTdsFormat(format: string, value: boolean | string): void;

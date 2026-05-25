@@ -16,6 +16,6 @@ declare class TableHeader extends Header {
     formats(): {
         [key: string]: any;
     };
-    getCellFormats(parent: TableCell | TableCellChildren): [Props, string];
+    getCellFormats(parent: TableCell | TableCellChildren): any[];
 }
 export default TableHeader;

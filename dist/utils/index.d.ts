@@ -21,7 +21,7 @@ declare function getComputeBounds(startCorrectBounds: CorrectBound, endCorrectBo
 declare function getComputeSelectedCols(computeBounds: CorrectBound, table: Element, container: Element): Element[];
 declare function getComputeSelectedTds(computeBounds: CorrectBound, table: Element, container: Element, type?: string): Element[];
 declare function getCopyTd(html: string): string;
-declare function getCorrectBounds(target: Element, container: Element): {
+declare function getCorrectBounds(target: Element, container?: Element): {
     left: number;
     top: number;
     width: number;
@@ -30,6 +30,8 @@ declare function getCorrectBounds(target: Element, container: Element): {
     bottom: number;
 };
 declare function getCorrectCellBlot(blot: TableCell | TableCellChildren): TableCell | null;
+declare function getCorrectContainerWidth(): number;
+declare function getCorrectWidth(width: number, isPercent: boolean): string;
 declare function getElementStyle(node: HTMLElement, rules: string[]): Props;
 declare function isDimensions(key: string): boolean;
 declare function isValidColor(color: string): boolean;
@@ -42,4 +44,4 @@ declare function setElementProperty(node: HTMLElement, properties: Props): void;
 declare function throttle(cb: Function, delay: number): () => void;
 declare function throttleStrong(cb: Function, delay: number): () => void;
 declare function updateTableWidth(table: HTMLElement, tableBounds: CorrectBound, change: number): void;
-export { addDimensionsUnit, convertUnitToInteger, createTooltip, debounce, filterWordStyle, getAlign, getCellChildBlot, getCellFormats, getCellId, getClosestElement, getComputeBounds, getComputeSelectedCols, getComputeSelectedTds, getCopyTd, getCorrectBounds, getCorrectCellBlot, getElementStyle, isDimensions, isValidColor, isValidDimensions, removeElementProperty, rgbToHex, rgbaToHex, setElementAttribute, setElementProperty, throttle, throttleStrong, updateTableWidth };
+export { addDimensionsUnit, convertUnitToInteger, createTooltip, debounce, filterWordStyle, getAlign, getCellChildBlot, getCellFormats, getCellId, getClosestElement, getComputeBounds, getComputeSelectedCols, getComputeSelectedTds, getCopyTd, getCorrectBounds, getCorrectCellBlot, getCorrectContainerWidth, getCorrectWidth, getElementStyle, isDimensions, isValidColor, isValidDimensions, removeElementProperty, rgbToHex, rgbaToHex, setElementAttribute, setElementProperty, throttle, throttleStrong, updateTableWidth };

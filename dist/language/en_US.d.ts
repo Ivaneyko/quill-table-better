@@ -3,10 +3,13 @@ declare const _default: {
     insColL: string;
     insColR: string;
     delCol: string;
+    selCol: string;
     row: string;
+    headerRow: string;
     insRowAbv: string;
     insRowBlw: string;
     delRow: string;
+    selRow: string;
     mCells: string;
     sCell: string;
     tblProps: string;

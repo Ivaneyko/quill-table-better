@@ -18,6 +18,13 @@ declare class TableCellBlock extends Block {
     getCellFormats(parent: TableCell): Props;
     wrapTableCell(parent: TableCell): void;
 }
+declare class TableThBlock extends TableCellBlock {
+    static blotName: string;
+    static className: string;
+    static tagName: string;
+    next: this | null;
+    parent: TableTh;
+}
 declare class TableCell extends Container {
     static blotName: string;
     static tagName: string;
@@ -40,6 +47,14 @@ declare class TableCell extends Container {
     table(): TableContainer;
     optimize(context?: unknown): void;
 }
+declare class TableTh extends TableCell {
+    static blotName: string;
+    static tagName: string;
+    children: LinkedList<TableThBlock | TableHeader | ListContainer>;
+    next: this | null;
+    parent: TableThRow;
+    prev: this | null;
+}
 declare class TableRow extends Container {
     static blotName: string;
     static tagName: string;
@@ -50,10 +65,25 @@ declare class TableRow extends Container {
     checkMerge(): boolean;
     rowOffset(): number;
 }
+declare class TableThRow extends TableRow {
+    static blotName: string;
+    static tagName: string;
+    children: LinkedList<TableTh>;
+    next: this | null;
+    parent: TableThead;
+    prev: this | null;
+}
 declare class TableBody extends Container {
     static blotName: string;
     static tagName: string;
     children: LinkedList<TableRow>;
+    next: this | null;
+    parent: TableContainer;
+}
+declare class TableThead extends TableBody {
+    static blotName: string;
+    static tagName: string;
+    children: LinkedList<TableThRow>;
     next: this | null;
     parent: TableContainer;
 }
@@ -96,15 +126,16 @@ declare class TableContainer extends Container {
     deleteRow(rows: TableRow[], deleteTable: () => void): void;
     deleteTable(): void;
     findChild(blotName: string): TableBody | TableTemporary | TableColgroup;
-    getCopyTable(): string;
+    getCopyTable(html?: string): string;
     getCorrectRow(prev: TableRow, maxColumns: number): TableRow;
-    getInsertRow(prev: TableRow, ref: TableRow | null, offset: number): TableRow;
+    getInsertRow(prev: TableRow, ref: TableRow | null, offset: number, isTh?: boolean): TableRow;
     getMaxColumns(children: LinkedList<TableCell>): number;
     insertColumn(position: number, isLast: boolean, w: number, offset: number): void;
     insertCol(colgroup: TableColgroup, ref: TableCol | null): void;
-    insertColumnCell(row: TableRow | null, id: string, ref: TableCell | null): TableCell;
-    insertRow(index: number, offset: number): void;
-    insertTableCell(colspan: number, formats: Props, row: TableRow): void;
+    insertColumnCell(row: TableRow | TableThRow, id: string, ref: TableCell | TableTh): TableCell;
+    insertRow(index: number, offset: number, isTh?: boolean): void;
+    insertTableCell(colspan: number, formats: Props, row: TableRow, isTh?: boolean): void;
+    isPercent(): boolean;
     optimize(context: unknown): void;
     setCellColspan(cell: TableCell, offset: number): void;
     setCellRowspan(parentElement: Element): void;
@@ -112,7 +143,8 @@ declare class TableContainer extends Container {
     private setColumnCells;
     tbody(): TableBody;
     temporary(): TableTemporary;
+    thead(): TableThead;
 }
 declare function cellId(): string;
 declare function tableId(): string;
-export { cellId, TableCellBlock, TableCell, TableRow, TableBody, TableTemporary, TableContainer, tableId, TableCol, TableColgroup };
+export { cellId, TableCellBlock, TableThBlock, TableCell, TableTh, TableRow, TableThRow, TableBody, TableThead, TableTemporary, TableContainer, tableId, TableCol, TableColgroup };

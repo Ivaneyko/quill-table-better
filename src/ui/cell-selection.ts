@@ -20,6 +20,7 @@ import {
 import { applyFormat } from '../utils/clipboard-matchers';
 import {
   TableCellBlock,
+  TableThBlock,
   TableCell,
   TableRow,
   TableThRow
@@ -392,7 +393,7 @@ class CellSelection {
     document.addEventListener('copy', (e: ClipboardEvent) => this.onCaptureCopy(e, false));
     document.addEventListener('cut', (e: ClipboardEvent) => this.onCaptureCopy(e, true));
     document.addEventListener('keyup', this.handleDeleteKeyup.bind(this));
-    document.addEventListener('paste', this.onCapturePaste.bind(this));
+    document.addEventListener('paste', this.onCapturePaste.bind(this), true);
   }
 
   initWhiteList() {
@@ -494,6 +495,7 @@ class CellSelection {
       }
       const td = up ? this.startTd : this.endTd;
       const cell = Quill.find(td) as TableCell;
+      if (!cell) return;
       const targetRow = this.getTableArrowVerticalRow(cell, up);
       const { left: _left, right: _right } = td.getBoundingClientRect();
       if (targetRow) {
@@ -545,7 +547,10 @@ class CellSelection {
     const container = document.createElement('div');
     container.innerHTML = html;
     const copyRows = Array.from(container.querySelectorAll('tr'));
-    if (!copyRows.length) return;
+    if (!copyRows.length) {
+      if (text) this.pasteTextIntoCell(text);
+      return;
+    }
     const cell = Quill.find(this.startTd) as TableCell;
     const row = cell.row();
     const table = cell.table();
@@ -618,6 +623,31 @@ class CellSelection {
       .concat(applyFormat(pastedDelta, formats));
     this.quill.updateContents(delta, Quill.sources.USER);
     return _cell;
+  }
+
+  pasteTextIntoCell(text: string) {
+    const range = this.quill.getSelection();
+    if (!range) return;
+    const formats = this.quill.getFormat(range.index);
+    const blockKey = formats[TableThBlock.blotName]
+      ? TableThBlock.blotName
+      : TableCellBlock.blotName;
+    const blockId = formats[blockKey];
+    if (!blockId) return;
+    const lines = text.split('\n');
+    const pastedDelta = lines.reduce((delta: Delta, line: string, i: number) => {
+      if (line) delta.insert(line);
+      if (i < lines.length - 1) {
+        delta.insert('\n', { [blockKey]: blockId });
+      }
+      return delta;
+    }, new Delta());
+    const delta = new Delta()
+      .retain(range.index)
+      .delete(range.length)
+      .concat(pastedDelta);
+    this.quill.updateContents(delta, Quill.sources.USER);
+    this.quill.setSelection(range.index + pastedDelta.length(), Quill.sources.SILENT);
   }
 
   removeCursor() {
@@ -703,7 +733,9 @@ class CellSelection {
   }
 
   setSelected(target: Element, force: boolean = true) {
+    if (!target) return;
     const cell = Quill.find(target) as TableCell;
+    if (!cell) return;
     this.clearSelected();
     this.startTd = target;
     this.endTd = target;
@@ -796,7 +828,7 @@ class CellSelection {
             }
             child = child.nextElementSibling;
           }
-          this.setSelected(row.firstElementChild);
+          if (row.firstElementChild) this.setSelected(row.firstElementChild);
         }
         break;
       default:

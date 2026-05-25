@@ -1,11 +1,13 @@
 import Quill from 'quill';
-import type { CorrectBound, Props, QuillTableBetter, TableCellMap, TableColgroup, TableRow } from '../types';
-import { TableCell } from '../formats/table';
+import type { CorrectBound, Props, QuillTableBetter, TableCellMap, TableColgroup } from '../types';
+import { TableCell, TableRow } from '../formats/table';
 import TablePropertiesForm from './table-properties-form';
 interface Children {
     [propName: string]: {
         content: string;
         handler: () => void;
+        divider?: boolean;
+        createSwitch?: boolean;
     };
 }
 declare class TableMenus {
@@ -17,22 +19,28 @@ declare class TableMenus {
     scroll: boolean;
     tableBetter: QuillTableBetter;
     tablePropertiesForm: TablePropertiesForm;
+    tableHeaderRow: HTMLElement | null;
     constructor(quill: Quill, tableBetter?: QuillTableBetter);
+    convertToRow(): void;
+    convertToHeaderRow(): void;
     copyTable(): Promise<void>;
     createList(children: Children): HTMLUListElement;
-    createMenu(left: string, right: string, isDropDown: boolean): HTMLDivElement;
+    createMenu(left: string, right: string, isDropDown: boolean, category: string): HTMLDivElement;
     createMenus(): HTMLDivElement;
+    createSwitch(content: string): DocumentFragment;
     deleteColumn(isKeyboard?: boolean): void;
     deleteRow(isKeyboard?: boolean): void;
     deleteTable(): void;
     destroyTablePropertiesForm(): void;
+    disableMenu(category: string, disabled?: boolean): void;
     getCellsOffset(computeBounds: CorrectBound, bounds: CorrectBound, leftColspan: number, rightColspan: number): number;
     getColsOffset(colgroup: TableColgroup, computeBounds: CorrectBound, bounds: CorrectBound): number;
     getCorrectBounds(table: HTMLElement): CorrectBound[];
-    getCorrectTds(deleteTds: Element[], computeBounds: CorrectBound, leftTd: Element, rightTd: Element): {
+    getCorrectTds(selectTds: Element[], computeBounds: CorrectBound, leftTd: Element, rightTd: Element): {
         changeTds: [Element, number][];
-        delTds: Element[];
+        selTds: Element[];
     };
+    getCorrectRows(): TableRow[];
     getDiffOffset(map: TableCellMap, colspan?: number): number;
     getRefInfo(row: TableRow, right: number): {
         id: string;
@@ -58,10 +66,14 @@ declare class TableMenus {
     insertParagraph(offset: number): void;
     insertRow(td: HTMLTableColElement, offset: number): void;
     mergeCells(): void;
+    selectColumn(): void;
+    selectRow(): void;
     setCellsMap(cell: TableCell, map: TableCellMap): void;
     showMenus(): void;
     splitCell(): void;
-    toggleAttribute(list: HTMLUListElement, tooltip: HTMLDivElement): void;
+    toggleAttribute(list: HTMLUListElement, tooltip: HTMLDivElement, e?: PointerEvent): void;
+    toggleHeaderRow(): void;
+    toggleHeaderRowSwitch(value?: string): void;
     updateMenus(table?: HTMLElement): void;
     getFocusedCell(table: HTMLElement): HTMLElement | null;
     getCellBounds(cell: HTMLElement | null, table: HTMLElement): DOMRect;

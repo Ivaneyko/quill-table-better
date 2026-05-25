@@ -1,5 +1,5 @@
 import QuillTableBetter from '../quill-table-better';
-import { TableCellBlock, TableCell, TableRow, TableBody, TableTemporary, TableContainer, TableCol, TableColgroup } from '../formats/table';
+import { TableCellBlock, TableThBlock, TableCell, TableTh, TableRow, TableThRow, TableBody, TableThead, TableTemporary, TableContainer, TableCol, TableColgroup } from '../formats/table';
 import TableHeader from '../formats/header';
 import TableList, { ListContainer } from '../formats/list';
 import CellSelection from '../ui/cell-selection';
@@ -24,5 +24,5 @@ export declare type TableCellAllowedChildren = TableCellBlock | TableHeader | Li
 export declare type TableCellChildren = TableCellAllowedChildren | TableList;
 export declare type TableCellMap = Map<string, HTMLElement[]>;
 export declare type UseLanguageHandler = (name: string) => string;
-export type { QuillTableBetter, TableCellBlock, TableCell, TableRow, TableBody, TableTemporary, TableContainer, TableCol, TableColgroup, TableHeader, TableList, ListContainer, CellSelection, OperateLine, TableMenus, ToolbarTable, TableSelect, TableToolbar, TableClipboard };
+export type { QuillTableBetter, TableCellBlock, TableThBlock, TableCell, TableTh, TableRow, TableThRow, TableBody, TableThead, TableTemporary, TableContainer, TableCol, TableColgroup, TableHeader, TableList, ListContainer, CellSelection, OperateLine, TableMenus, ToolbarTable, TableSelect, TableToolbar, TableClipboard };
 export default QuillTableBetter;

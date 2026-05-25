@@ -2,7 +2,7 @@ import Quill from 'quill';
 import type { QuillTableBetter, TableColgroup } from '../types';
 interface Options {
     tableNode: HTMLElement;
-    cellNode: HTMLElement;
+    cellNode: Element;
     mousePosition: {
         clientX: number;
         clientY: number;
@@ -71,6 +71,7 @@ declare class OperateLine {
     setCellLevelRect(cell: Element, clientX: number): void;
     setCellRect(cell: Element, clientX: number, clientY: number): void;
     setCellsRect(cell: Element, changeX: number, changeY: number): void;
+    setColWidth(domNode: HTMLElement, width: string, isPercent: boolean): void;
     setCellVerticalRect(cell: Element, clientY: number): void;
     toggleLineChildClass(isAdd: boolean): void;
     updateCell(node: Element): void;

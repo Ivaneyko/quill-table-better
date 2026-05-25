@@ -39,10 +39,12 @@ declare class Table extends Module {
     getTable(range?: Range): [null, null, null, -1] | [TableContainer, TableRow, TableCell, number];
     handleKeyup(e: KeyboardEvent): void;
     handleMousedown(e: MouseEvent): void;
+    handleMouseMove(): void;
     handleScroll(): void;
     hideTools(): void;
     insertTable(rows: number, columns: number): void;
     private isTable;
+    listenDeleteTable(): void;
     private registerToolbarTable;
     showTools(force?: boolean): void;
     private updateMenus;
