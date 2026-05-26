@@ -55,6 +55,7 @@ declare class CellSelection {
         hasTh: boolean;
     };
     initDocumentListener(): void;
+    handleDocumentMousedown(e: MouseEvent): void;
     initWhiteList(): void;
     insertColumnCell(table: TableContainer, offset: number): void;
     insertRow(table: TableContainer, offset: number, td: Element): void;

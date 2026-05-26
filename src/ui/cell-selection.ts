@@ -394,6 +394,12 @@ class CellSelection {
     document.addEventListener('cut', (e: ClipboardEvent) => this.onCaptureCopy(e, true));
     document.addEventListener('keyup', this.handleDeleteKeyup.bind(this));
     document.addEventListener('paste', this.onCapturePaste.bind(this), true);
+    document.addEventListener('mousedown', this.handleDocumentMousedown.bind(this));
+  }
+
+  handleDocumentMousedown(e: MouseEvent) {
+    if (this.quill.container.contains(e.target as Node)) return;
+    this.tableBetter.hideTools();
   }
 
   initWhiteList() {
