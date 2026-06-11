@@ -190,13 +190,37 @@ class Table extends Module {
         // @ts-expect-error
         const length = tableBlot.length();
         const range = this.quill.getSelection();
-        const minIndex = Math.min(range.index, index);
-        const maxIndex = Math.max(range.index + range.length, index + length);
-        this.quill.setSelection(
-          minIndex,
-          maxIndex - minIndex,
-          Quill.sources.USER
-        );
+        // The selection may already be gone by the time mouseup fires
+        // (e.g. focus left the editor while dragging).
+        if (range) {
+          const minIndex = Math.min(range.index, index);
+          const maxIndex = Math.max(range.index + range.length, index + length);
+          // During a mouse drag-select that spans the table, the underlying
+          // cell node can be detached from the DOM before this mouseup fires
+          // (DOM state race). Quill's Selection.setNativeRange only guards
+          // `startNode != null`, so a null endNode leads to
+          // `endNode.parentNode` throwing. Skip the call when the editor root
+          // or the table is no longer connected, and wrap it defensively so a
+          // late DOM mutation can never crash the editor.
+          if (this.quill.root.isConnected && table.isConnected) {
+            try {
+              this.quill.setSelection(
+                minIndex,
+                maxIndex - minIndex,
+                Quill.sources.USER
+              );
+            } catch (error) {
+              // Swallow the race between drag-select and DOM detachment.
+              // Not silent: surface it in dev so regressions stay visible.
+              if (process.env.NODE_ENV !== 'production') {
+                console.warn(
+                  '[quill-table-better] Skipped setSelection after table drag-select; target node was detached from the DOM.',
+                  error
+                );
+              }
+            }
+          }
+        }
       }
       this.quill.root.removeEventListener('mousemove', handleMouseMove);
       this.quill.root.removeEventListener('mouseup', handleMouseup);
