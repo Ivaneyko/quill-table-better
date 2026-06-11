@@ -132,6 +132,7 @@ class TableCell extends Container {
   
   static create(value: Props) {
     const node = super.create() as HTMLElement;
+    value = value || {};
     const keys = Object.keys(value);
     for (const key of keys) {
       value[key] && node.setAttribute(key, value[key]);
@@ -329,6 +330,7 @@ class TableTemporary extends Block {
 
   static create(value: Props) {
     const node = super.create();
+    value = value || {};
     const keys = Object.keys(value);
     const className = TableContainer.defaultClassName;
     for (const key of keys) {
@@ -385,6 +387,7 @@ class TableCol extends Block {
 
   static create(value: Props) {
     const node = super.create();
+    value = value || {};
     const keys = Object.keys(value);
     for (const key of keys) {
       node.setAttribute(key, value[key]);

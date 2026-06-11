@@ -15,7 +15,7 @@ class TableHeader extends Header {
   parent: TableCell;
 
   static create(formats: Props) {
-    const { cellId, value } = formats;
+    const { cellId, value } = formats || {};
     const node = super.create(value);
     node.setAttribute('data-cell', cellId);
     return node;

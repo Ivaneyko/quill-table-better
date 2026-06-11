@@ -15,6 +15,7 @@ class ListContainer extends Container {
 
   static create(value: Props) {
     const node = super.create() as HTMLElement;
+    value = value || {};
     for (const key of DEFAULT_ATTRIBUTE) {
       if (value[key] == '1') delete value[key];
     }
