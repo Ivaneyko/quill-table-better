@@ -88,31 +88,24 @@ function matchTableTemporary(node: HTMLElement, delta: Delta) {
     .concat(delta);
 }
 
-// Mirrors Quill's internal clipboard `deltaEndsWith` (not exported by quill):
-// checks whether the delta's trailing string content ends with `text`.
-function deltaEndsWith(delta: Delta, text: string): boolean {
-  let endText = '';
-  for (
-    let i = delta.ops.length - 1;
-    i >= 0 && endText.length < text.length;
-    i--
-  ) {
-    const op = delta.ops[i];
-    if (typeof op.insert !== 'string') break;
-    endText = op.insert + endText;
-  }
-  return endText.slice(-1 * text.length) === text;
-}
-
 function matchTableTh(node: HTMLTableCellElement, delta: Delta) {
-  // A <th> cell needs its content to be a block, i.e. the delta must end with a
-  // newline. Only append one when the delta doesn't already end with `\n`
-  // (checked across the whole delta, not per-op). This keeps convert
-  // idempotent: a non-canonical `<th>Text</th>` gets exactly one block break,
-  // while `<th><p>Text</p></th>` / canonical / multi-line / empty <th> already
-  // end with `\n` and are left untouched — no accumulating empty blocks.
-  if (node.tagName === 'TH' && !deltaEndsWith(delta, '\n')) {
-    delta.insert('\n');
+  // A <th> cell needs its content to end in a block newline. Append `\n` to the
+  // LAST string op's own string, and only when it doesn't already end with one.
+  //
+  // The newline MUST stay merged into the text op (not a separate insert): the
+  // following `applyFormat(..., 'table-th-block', ...)` applies a block-scoped
+  // format to every op, and a block format on a text-only op with no trailing
+  // newline is invalid — Quill drops it and the header text vanishes.
+  //
+  // Checking only the last op (not every op) is what makes convert idempotent:
+  //   <th>Text</th>          [{insert:"Text"}]              -> [{insert:"Text\n"}]        (one block)
+  //   <th><p>Text</p></th>   [{insert:"Text"},{insert:"\n"}] -> last op is "\n", unchanged (no extra empty block)
+  //   canonical / multi-line / empty <th> already end in "\n" -> unchanged
+  if (node.tagName === 'TH') {
+    const last = delta.ops[delta.ops.length - 1];
+    if (last && typeof last.insert === 'string' && !last.insert.endsWith('\n')) {
+      last.insert += '\n';
+    }
   }
   return delta;
 }
