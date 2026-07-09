@@ -88,16 +88,31 @@ function matchTableTemporary(node: HTMLElement, delta: Delta) {
     .concat(delta);
 }
 
+// Mirrors Quill's internal clipboard `deltaEndsWith` (not exported by quill):
+// checks whether the delta's trailing string content ends with `text`.
+function deltaEndsWith(delta: Delta, text: string): boolean {
+  let endText = '';
+  for (
+    let i = delta.ops.length - 1;
+    i >= 0 && endText.length < text.length;
+    i--
+  ) {
+    const op = delta.ops[i];
+    if (typeof op.insert !== 'string') break;
+    endText = op.insert + endText;
+  }
+  return endText.slice(-1 * text.length) === text;
+}
+
 function matchTableTh(node: HTMLTableCellElement, delta: Delta) {
-  if (node.tagName === 'TH') {
-    delta.ops.forEach(op => {
-      if (
-        typeof op.insert === 'string' &&
-        !op.insert.endsWith('\n')
-      ) {
-        op.insert += '\n';
-      }
-    });
+  // A <th> cell needs its content to be a block, i.e. the delta must end with a
+  // newline. Only append one when the delta doesn't already end with `\n`
+  // (checked across the whole delta, not per-op). This keeps convert
+  // idempotent: a non-canonical `<th>Text</th>` gets exactly one block break,
+  // while `<th><p>Text</p></th>` / canonical / multi-line / empty <th> already
+  // end with `\n` and are left untouched — no accumulating empty blocks.
+  if (node.tagName === 'TH' && !deltaEndsWith(delta, '\n')) {
+    delta.insert('\n');
   }
   return delta;
 }
